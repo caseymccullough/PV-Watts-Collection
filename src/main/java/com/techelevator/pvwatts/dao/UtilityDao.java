@@ -38,4 +38,12 @@ public interface UtilityDao {
      */
     Utility updateUtility(Utility updatedUtility);
 
+    /**
+     * Delete a utility from the datastore.
+     * Reassigns all associated generators a utilityId of 0
+     *
+     * @param utilityId The id of the object to delete.
+     */
+    void deleteUtilityById(int utilityId);
+
 }

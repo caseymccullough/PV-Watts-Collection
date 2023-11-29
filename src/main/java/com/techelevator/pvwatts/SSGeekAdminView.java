@@ -242,6 +242,21 @@ public class SSGeekAdminView {
     // region Prompt the user for object property information
     // **************************************************************
 
+    public Utility promptForUtilityInformation (Utility existingUtility) {
+        Utility newUtility = new Utility();
+        if (existingUtility == null) {
+            // no default values
+            newUtility.setName (promptForUtilityName(null));
+        } else {
+            newUtility.setName (promptForUtilityName(existingUtility.getName()));
+        }
+        return newUtility;
+    }
+
+        private String promptForUtilityName(String defaultValue) {
+        return promptForString("Utility name", true, defaultValue);
+    }
+
 //    public Customer promptForCustomerInformation(Customer existingCustomer) {
 //        Customer newCustomer = new Customer();
 //        if (existingCustomer == null) {
@@ -325,31 +340,31 @@ public class SSGeekAdminView {
 //    private String promptForImageName(String defaultValue) {
 //        return promptForString("Image name", false, defaultValue);
 //    }
-//
-//    private String promptWithDefault(String prompt, Object defaultValue) {
-//        if (defaultValue != null) {
-//            return prompt + "[" + defaultValue.toString() + "]: ";
-//        }
-//        return prompt + ": ";
-//    }
-//
-//    private String promptForString(String prompt, boolean required, String defaultValue) {
-//        prompt = promptWithDefault(prompt, defaultValue);
-//        while (true) {
-//            String entry = console.promptForString(prompt);
-//            if (!entry.isEmpty()) {
-//                return entry;
-//            }
-//            // Entry is empty: see if we have a default, or if empty is OK (!required)
-//            if (defaultValue != null && !defaultValue.isEmpty()) {
-//                return defaultValue;
-//            }
-//            if (!required) {
-//                return entry;
-//            }
-//            printErrorMessage("A value is required, please try again.");
-//        }
-//    }
+
+    private String promptWithDefault(String prompt, Object defaultValue) {
+        if (defaultValue != null) {
+            return prompt + "[" + defaultValue.toString() + "]: ";
+        }
+        return prompt + ": ";
+    }
+
+    private String promptForString(String prompt, boolean required, String defaultValue) {
+        prompt = promptWithDefault(prompt, defaultValue);
+        while (true) {
+            String entry = console.promptForString(prompt);
+            if (!entry.isEmpty()) {
+                return entry;
+            }
+            // Entry is empty: see if we have a default, or if empty is OK (!required)
+            if (defaultValue != null && !defaultValue.isEmpty()) {
+                return defaultValue;
+            }
+            if (!required) {
+                return entry;
+            }
+            printErrorMessage("A value is required, please try again.");
+        }
+    }
 //
 //    private BigDecimal promptForBigDecimal(String prompt, boolean required, BigDecimal defaultValue) {
 //        prompt = promptWithDefault(prompt, defaultValue);

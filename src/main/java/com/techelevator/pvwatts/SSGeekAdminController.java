@@ -6,6 +6,7 @@ import com.techelevator.pvwatts.exception.DaoException;
 import com.techelevator.pvwatts.model.Generator;
 import com.techelevator.pvwatts.model.Utility;
 import com.techelevator.util.BasicConsole;
+import jdk.jshell.execution.Util;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -78,14 +79,15 @@ public class SSGeekAdminController {
         final String UTILITY_DETAILS = "View utility details";
         final String UTILITY_ADD = "Add utility";
         final String UTILITY_UPDATE = "Update utility details";
+        final String UTILITY_DELETE = "Delete utility";
         final String DONE = "Main menu";
-        final String[] MENU_OPTIONS = {UTILITY_LIST, UTILITY_DETAILS, UTILITY_ADD, UTILITY_UPDATE, DONE};
+        final String[] MENU_OPTIONS = {UTILITY_LIST, UTILITY_DETAILS, UTILITY_ADD, UTILITY_UPDATE, UTILITY_DELETE, DONE};
 
         boolean finished = false;
 
         // The menu loop
         while (!finished) {
-            String selection = view.getMenuSelection("Customer administration menu", MENU_OPTIONS);
+            String selection = view.getMenuSelection("Utility administration menu", MENU_OPTIONS);
             try {
                 switch (selection) {
                     case UTILITY_LIST:
@@ -99,6 +101,9 @@ public class SSGeekAdminController {
                         break;
                     case UTILITY_UPDATE:
                         updateUtility();
+                        break;
+                    case UTILITY_DELETE:
+                        deleteUtility();
                         break;
                     case DONE:
                         // Set finished to true so the loop exits.
@@ -119,8 +124,9 @@ public class SSGeekAdminController {
          // Menu options
         final String GENERATOR_LIST = "List all generators";
         final String GENERATOR_DETAILS = "Show generator details";
+        final String GENERATOR_POWER_FORECAST = "Get power forecast for generator";
         final String DONE = "Main menu";
-        final String[] MENU_OPTIONS = {GENERATOR_LIST, DONE};
+        final String[] MENU_OPTIONS = {GENERATOR_LIST, GENERATOR_POWER_FORECAST, DONE};
 
         boolean finished = false;
 
@@ -134,6 +140,9 @@ public class SSGeekAdminController {
                         break;
                     case GENERATOR_DETAILS:
                         displayGenerator();
+                        break;
+                    case GENERATOR_POWER_FORECAST:
+                        // getPowerForecastForGenerator();
                         break;
                     case DONE:
                         // Set finished to true so the loop exits.
@@ -178,18 +187,17 @@ public class SSGeekAdminController {
 
     private void addUtility() {
 
-    view.printMessage("Under development");
-        // Prompt the user for product information
-//        Product newProduct = view.promptForProductInformation(null);
-//
-//        // If product is null, user cancelled
-//        if (newProduct == null) {
-//            return;
-//        }
-//        // Call the DAO to add the new product
-//        newProduct = productDao.createProduct(newProduct);
-//        // Inform the user
-//        view.printMessage("Product " + newProduct.getProductId() + " has been created.");
+        // Prompt the user for utility information
+        Utility newUtility= view.promptForUtilityInformation(null);
+
+        // If utility is null, user cancelled
+        if (newUtility == null) {
+            return;
+        }
+        // Call the DAO to add the new utility
+        newUtility = utilityDao.createUtility(newUtility);
+        // Inform the user
+        view.printMessage("Utility " + newUtility.getUtilityId() + " has been created.");
     }
 
     private void updateUtility() {
@@ -215,32 +223,31 @@ public class SSGeekAdminController {
     }
 
     private void deleteUtility() {
-        view.printMessage("Under development");
 
-//        // Get the list of products so the user can choose one
-//        List<Product> products = productDao.getProductsWithNoSales();
-//
-//        // Display the list of products and ask for selection
-//        if (products.size() == 0) {
-//            // Nothing can be deleted because there are orders
-//            view.printErrorMessage("There are no products that may be deleted!");
-//        }
-//        Product product = view.selectProduct(products);
-//        if (product == null) {
-//            // User cancelled
-//            return;
-//        }
-//        // Prompt the user for confirmation
-//        boolean isConfirmed = view.promptForYesNo("Are you sure you want to DELETE product '" + product.getName() + "'?");
-//        if (!isConfirmed) {
-//            // User cancelled
-//            return;
-//        }
-//
-//        // Call the DAO to delete the product
-//        productDao.deleteProductById(product.getProductId());
-//        // Inform the user
-//        view.printMessage("Product has been deleted.");
+        //Get the list of utilities so the user can choose one
+        List<Utility> utilities = utilityDao.getUtilities();
+
+//        // Display the list of utilities and ask for selection
+        if (utilities.size() == 0) {
+            // Nothing can be deleted
+            view.printErrorMessage("There are no utilities that may be deleted!");
+        }
+        Utility utility = view.selectUtility(utilities);
+        if (utility == null) {
+            // User cancelled
+            return;
+        }
+        // Prompt the user for confirmation
+        boolean isConfirmed = view.promptForYesNo("Are you sure you want to DELETE product '" + utility.getName() + "'?");
+        if (!isConfirmed) {
+            // User cancelled
+            return;
+        }
+
+        // Call the DAO to delete the product
+        utilityDao.deleteUtilityById(utility.getUtilityId());
+        // Inform the user
+        view.printMessage("Utility has been deleted.");
     }
     //*******************************************************
     //endregion Utility menu actions
@@ -269,7 +276,6 @@ public class SSGeekAdminController {
         view.printGeneratorDetail(generator);
 
     }
-
 
     //*******************************************************
     //endregion Generator menu actions

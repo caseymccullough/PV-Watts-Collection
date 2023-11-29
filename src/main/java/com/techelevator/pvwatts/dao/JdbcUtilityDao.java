@@ -2,6 +2,7 @@ package com.techelevator.pvwatts.dao;
 
 import com.techelevator.pvwatts.exception.DaoException;
 import com.techelevator.pvwatts.model.Utility;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -55,13 +56,44 @@ public class JdbcUtilityDao implements UtilityDao {
     }
 
     @Override
-    public Utility createUtility(Utility newUtility) {
-        return null;
+    public Utility createUtility(Utility utility) {
+        Utility newUtility = null;
+        String sql = "INSERT INTO public.utility(name) " +
+                "\tVALUES (?) RETURNING utility_id;";
+
+       try {
+           int newUtilityId = jdbcTemplate.queryForObject(sql, int.class, utility.getName());
+           newUtility = getUtilityById(newUtilityId);
+       } catch (CannotGetJdbcConnectionException e){
+           throw new DaoException("Cannot connect to server or database", e);
+       } catch (DataIntegrityViolationException e){
+           System.out.println(e.getMessage());
+           throw new DaoException("Data integrity violation", e);
+       }
+        return newUtility;
     }
 
     @Override
     public Utility updateUtility(Utility updatedUtility) {
         return null;
+    }
+
+    @Override
+    public void deleteUtilityById(int utilityId) {
+        String reassignGeneratorsSql = "UPDATE public.generator\n" +
+                "\tSET utility_id = 0\n" +
+                "\tWHERE utility_id = ?;";
+        String sql = "DELETE FROM utility WHERE utility_id = ?;";
+
+        try {
+            // assign utility_id of all generators from this utility to zero.
+            jdbcTemplate.update(reassignGeneratorsSql, utilityId);
+            jdbcTemplate.update(sql, utilityId);
+        } catch (CannotGetJdbcConnectionException e){
+            throw new DaoException("Cannot connect to server or database", e);
+        } catch (DataIntegrityViolationException e){
+            throw new DaoException("Data integrity violation", e);
+        }
     }
 
     private Utility mapToRowSet(SqlRowSet results) {

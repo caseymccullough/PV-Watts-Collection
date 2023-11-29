@@ -2,6 +2,7 @@ package com.techelevator.pvwatts.dao;
 
 import com.techelevator.pvwatts.exception.DaoException;
 import com.techelevator.pvwatts.model.Generator;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -73,8 +74,26 @@ public class JdbcGeneratorDao implements GeneratorDao {
     }
 
     @Override
-    public Generator createGenerator(Generator newGenerator) {
-        return null;
+    public Generator createGenerator(Generator generator) {
+        Generator newGenerator = null;
+
+        String sql = "INSERT INTO public.generator(\n" +
+                "\tutility_id, name, street_address1, street_address2, city, state, zip_code, system_size, module_type, array_type, tilt)\n" +
+                "\tVALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        try {
+            int newGeneratorId = jdbcTemplate.queryForObject(sql, int.class, generator.getUtilityId(), generator.getName(), generator.getStreetAddress1(), generator.getStreetAddress2(),
+                    generator.getCity(), generator.getZipCode(), generator.getSystemSize(), generator.getModuleType(), generator.getArrayType(), generator.getTilt());
+
+            // retrieve the newly created generator
+            newGenerator = getGeneratorById(newGeneratorId);
+        } catch (CannotGetJdbcConnectionException e){
+            throw new DaoException("Cannot connect to server or database", e);
+        } catch (DataIntegrityViolationException e){
+            throw new DaoException("Data integrity violation", e);
+        }
+
+        return newGenerator;
     }
 
     @Override
