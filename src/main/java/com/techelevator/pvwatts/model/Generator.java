@@ -2,22 +2,15 @@ package com.techelevator.pvwatts.model;
 
 public class Generator {
     private int generatorId;
-
     private int utilityId;
     private String name;
     private String streetAddress1;
-
     private String streetAddress2;
-
     private String city;
     private String state;
-
     private String zipCode;
-
     private double systemSize;
-
     private int moduleType;
-
     private int arrayType;
     private double tilt;
 

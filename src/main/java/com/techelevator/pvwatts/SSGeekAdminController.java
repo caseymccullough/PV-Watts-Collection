@@ -142,7 +142,7 @@ public class SSGeekAdminController {
                         displayGenerator();
                         break;
                     case GENERATOR_POWER_FORECAST:
-                        // getPowerForecastForGenerator();
+                        getPowerForecastForGenerator();
                         break;
                     case DONE:
                         // Set finished to true so the loop exits.
@@ -183,6 +183,22 @@ public class SSGeekAdminController {
         }
         // Show details to the user
         view.printUtilityDetail(utility);
+    }
+
+    private void getPowerForecastForGenerator() {
+
+        // Get the list of utilities so the user can choose one
+        List<Utility> utilities = utilityDao.getUtilities();
+
+        // Display the list of utilities and ask for selection
+        Utility utility = view.selectUtility(utilities);
+        if (utility == null) {
+            // User cancelled
+            return;
+        }
+
+        // Make call to NREL
+
     }
 
     private void addUtility() {
